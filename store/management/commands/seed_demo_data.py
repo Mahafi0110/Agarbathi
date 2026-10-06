@@ -2,6 +2,7 @@
 
     python manage.py seed_demo_data                  # add or refresh the demo items (no pictures)
     python manage.py seed_demo_data --wipe           # first delete ALL categories and products (asks to confirm)
+    python manage.py seed_demo_data --if-empty       # only seed when the store has no products (used on deploys)
     python manage.py seed_demo_data --upload-images  # also make a simple picture per item and send it to Cloudinary
 
 Safe to run more than once: items are matched by slug, so nothing is duplicated.
@@ -80,12 +81,16 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--wipe", action="store_true", help="Delete ALL categories and products first.")
+        parser.add_argument("--if-empty", action="store_true", help="Do nothing if the store already has products.")
         parser.add_argument("--yes", action="store_true", help="Do not ask for confirmation with --wipe.")
         parser.add_argument("--upload-images", action="store_true",
                             help="Make a simple picture for each item and upload it to Cloudinary.")
 
     @transaction.atomic
     def handle(self, *args, **opts):
+        if opts["if_empty"] and Product.objects.exists():
+            self.stdout.write("Store already has products. Skipped seeding.")
+            return
         if opts["wipe"]:
             if not opts["yes"]:
                 answer = input(f"This deletes ALL {Product.objects.count()} products and {Category.objects.count()} categories. Type yes to continue: ")
