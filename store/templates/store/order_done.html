@@ -1,0 +1,20 @@
+{% extends "store/base.html" %}
+{% block title %}Order #{{ order.pk }}{% endblock %}
+{% block content %}
+<section class="wrap block narrow">
+  {% if order.status == 'cancelled' %}
+  <h1 class="title">Order not completed</h1>
+  <p class="alert" role="alert">The payment for order #{{ order.pk }} did not go through, so the order was cancelled and nothing was charged. Your cart is still saved.</p>
+  <a class="btn" href="{% url 'store:cart' %}">Back to cart</a>
+  {% else %}
+  <h1 class="title">Thank you, {{ order.full_name }}</h1>
+  <p class="lead">Order #{{ order.pk }} is placed. We will call {{ order.phone }} if we need to confirm anything. Delivery takes 3 to 5 days.</p>
+  {% include "store/_order_summary.html" %}
+  {% include "store/_tracker.html" %}
+  <p><a class="btn" href="{% url 'store:shop' %}">Continue shopping</a>
+  {% if user.is_authenticated and order.user_id == user.id %}<a class="btn ghost" href="{% url 'store:account_order' order.pk %}">View in my orders</a>{% endif %}</p>
+  <p class="note">Save this page's link to check your order status later.</p>
+  <script>try { localStorage.removeItem("pooja_cart"); } catch (e) {}</script>
+  {% endif %}
+</section>
+{% endblock %}

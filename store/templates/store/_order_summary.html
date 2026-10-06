@@ -1,0 +1,11 @@
+<ul class="lines">
+  {% for i in order.items.all %}<li><span>{% if i.product %}<a href="{{ i.product.get_absolute_url }}">{{ i.title }}</a>{% else %}{{ i.title }}{% endif %} x {{ i.quantity }}</span><strong>&#8377;{{ i.line_total|floatformat:2 }}</strong></li>{% endfor %}
+</ul>
+<dl class="sum">
+  <div><dt>Items</dt><dd>&#8377;{{ order.subtotal|floatformat:2 }}</dd></div>
+  {% if order.discount_amount %}<div><dt>Coupon {{ order.coupon_code }}</dt><dd>- &#8377;{{ order.discount_amount|floatformat:2 }}</dd></div>{% endif %}
+  <div><dt>Delivery</dt><dd>{% if order.shipping_fee %}&#8377;{{ order.shipping_fee|floatformat:2 }}{% else %}Free{% endif %}</dd></div>
+  <div class="grand"><dt>Total</dt><dd>&#8377;{{ order.total|floatformat:2 }}</dd></div>
+</dl>
+<p class="note">Payment: {{ order.get_payment_method_display }}
+  {% if order.payment_method == 'cod' and order.payment_status != 'paid' %}(pay when it arrives){% else %}&middot; {{ order.get_payment_status_display }}{% endif %}</p>

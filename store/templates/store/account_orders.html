@@ -1,0 +1,14 @@
+{% extends "store/base.html" %}
+{% block title %}My orders{% endblock %}
+{% block content %}
+<section class="wrap block">
+  <h1 class="title">My orders</h1>
+  {% for o in orders %}
+  <a class="order-row" href="{% url 'store:account_order' o.pk %}">
+    <span><strong>Order #{{ o.pk }}</strong><br><span class="muted">{{ o.created_at|date:"j M Y" }} &middot; {{ o.items.count }} item{{ o.items.count|pluralize }}</span></span>
+    <span class="muted">{{ o.get_status_display }}</span>
+    <strong>&#8377;{{ o.total|floatformat:2 }}</strong>
+  </a>
+  {% empty %}<p class="empty">You have no orders yet. <a href="{% url 'store:shop' %}">Start shopping</a>.</p>{% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "store/base.html" %}
+{% block title %}{% if category %}{{ category.name }}{% else %}All pooja items{% endif %}{% endblock %}
+{% block content %}
+<section class="wrap block">
+  <h1 class="title">{% if category %}{{ category.name }}{% elif q %}Results for "{{ q }}"{% else %}All pooja items{% endif %}</h1>
+  {% if category.description %}<p class="lead">{{ category.description }}</p>{% endif %}
+
+  <form class="toolbar" method="get">
+    {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+    <label for="sort">Sort by</label>
+    <select id="sort" name="sort">
+      <option value="">Newest</option>
+      <option value="rating" {% if sort == 'rating' %}selected{% endif %}>Customer rating</option>
+      <option value="discount" {% if sort == 'discount' %}selected{% endif %}>Biggest discount</option>
+      <option value="low" {% if sort == 'low' %}selected{% endif %}>Price: low to high</option>
+      <option value="high" {% if sort == 'high' %}selected{% endif %}>Price: high to low</option>
+      <option value="name" {% if sort == 'name' %}selected{% endif %}>Name</option>
+    </select>
+    <label for="min">Price</label>
+    <input id="min" class="num" type="number" min="0" name="min" placeholder="Min" value="{{ min }}">
+    <input class="num" type="number" min="0" name="max" placeholder="Max" aria-label="Maximum price" value="{{ max }}">
+    <label class="check"><input type="checkbox" name="instock" value="1" {% if instock %}checked{% endif %}> In stock only</label>
+    <button class="btn small" type="submit">Apply</button>
+  </form>
+
+  <div class="grid">
+    {% for p in page %}{% include "store/_card.html" %}{% empty %}
+    <p class="empty">Nothing matches that search. Try another word or browse all items.</p>{% endfor %}
+  </div>
+
+  {% if page.has_other_pages %}
+  <nav class="pager" aria-label="Pages">
+    {% if page.has_previous %}<a href="?{% if querystring %}{{ querystring }}&amp;{% endif %}page={{ page.previous_page_number }}">Previous</a>{% endif %}
+    <span>Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+    {% if page.has_next %}<a href="?{% if querystring %}{{ querystring }}&amp;{% endif %}page={{ page.next_page_number }}">Next</a>{% endif %}
+  </nav>
+  {% endif %}
+</section>
+{% endblock %}

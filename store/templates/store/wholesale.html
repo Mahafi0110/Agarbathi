@@ -1,0 +1,29 @@
+{% extends "store/base.html" %}
+{% block title %}Wholesale agarbatti{% endblock %}
+{% block meta %}Wholesale agarbatti and dhoop rates for shops, temples and distributors. Send an enquiry for bulk and private-label quotes.{% endblock %}
+{% block content %}
+<section class="wrap block wh-page">
+  <div>
+    <h1 class="title">Wholesale agarbatti for shops, temples and distributors</h1>
+    <p class="lead">Stock your shelves with the same sticks our retail customers reorder. Many products carry a wholesale rate that applies automatically in your cart once you reach the minimum packs. For cartons, mixed orders or your own brand label, send us an enquiry and we will call you with a quote.</p>
+    {% if deals %}
+    <h2 class="sub">Wholesale rates you can order right now</h2>
+    <ul class="deal-list">
+      {% for p in deals %}
+      <li><a href="{{ p.get_absolute_url }}">{{ p.title }}</a>
+        <span>&#8377;{{ p.wholesale_price|floatformat:0 }} each at {{ p.wholesale_min_qty }}+ packs <s class="mrp">&#8377;{{ p.price|floatformat:0 }}</s></span></li>
+      {% endfor %}
+    </ul>
+    <a class="btn ghost" href="{% url 'store:shop' %}">Browse all products</a>
+    {% endif %}
+  </div>
+  <form class="checkout" method="post" action="{% url 'store:wholesale' %}">
+    {% csrf_token %}
+    <h2>Wholesale enquiry</h2>
+    {% for field in form %}{% if field.is_hidden %}{{ field }}{% else %}
+    <div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}
+      {% for e in field.errors %}<p class="err">{{ e }}</p>{% endfor %}</div>{% endif %}{% endfor %}
+    <button class="btn" type="submit">Send enquiry</button>
+  </form>
+</section>
+{% endblock %}

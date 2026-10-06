@@ -1,0 +1,97 @@
+{% extends "store/base.html" %}
+{% load static %}
+{% block content %}
+<style>.vhero-scents a{color:inherit;text-decoration:none}.vhero-scents a:hover{color:var(--crimson)}</style>
+<section class="vhero">
+  <div class="wrap vhero-grid">
+    <div class="vhero-copy">
+      <h1>Fragrance for every prayer, <em>by the pack or by the carton</em></h1>
+      <p>Hand-rolled sandalwood, rose, jasmine and champa agarbatti. Buy a single pack for your pooja room, or stock your shop and temple at wholesale rates.</p>
+      <div class="vhero-cta">
+        <a class="btn" href="{% url 'store:shop' %}">Shop retail</a>
+        <a class="btn ghost" href="{% url 'store:wholesale' %}">Wholesale rates</a>
+      </div>
+      <ul class="vhero-facts">
+        <li><strong>Retail and bulk</strong><span>One pack or one carton</span></li>
+        <li><strong>Volume pricing</strong><span>Applied in your cart</span></li>
+        <li><strong>Free delivery</strong><span>Above &#8377;{{ free_shipping_above|floatformat:0 }}</span></li>
+      </ul>
+    </div>
+
+    <div class="vhero-art" aria-hidden="true">
+      <svg viewBox="0 0 520 560" role="img" focusable="false">
+        <defs>
+          <radialGradient id="glow" cx="50%" cy="48%" r="50%">
+            <stop offset="0" stop-color="#E9A114" stop-opacity=".28"/><stop offset="1" stop-color="#E9A114" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="brass" x1="0" x2="1"><stop offset="0" stop-color="#9c7a1c"/><stop offset=".5" stop-color="#D4AF37"/><stop offset="1" stop-color="#8a6a14"/></linearGradient>
+        </defs>
+        <circle cx="260" cy="290" r="250" fill="url(#glow)"/>
+        <circle cx="260" cy="290" r="205" fill="none" stroke="#D4AF37" stroke-width="2"/>
+        <circle cx="260" cy="290" r="185" fill="none" stroke="#D4AF37" stroke-width="1" stroke-dasharray="2 9" stroke-linecap="round"/>
+        <!-- smoke -->
+        <g fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round">
+          <path class="smoke s1" d="M196 196 C170 160 222 140 198 104 S214 60 196 28"/>
+          <path class="smoke s2" d="M260 150 C236 118 286 98 262 64 S278 30 262 4"/>
+          <path class="smoke s3" d="M326 200 C300 164 352 144 328 108 S344 64 326 34"/>
+        </g>
+        <!-- sticks -->
+        <g stroke-linecap="round">
+          <line x1="262" y1="440" x2="198" y2="200" stroke="#3b2a18" stroke-width="5"/>
+          <line x1="262" y1="440" x2="260" y2="154" stroke="#3b2a18" stroke-width="5"/>
+          <line x1="262" y1="440" x2="326" y2="204" stroke="#3b2a18" stroke-width="5"/>
+        </g>
+        <g><circle class="ember" cx="198" cy="200" r="6" fill="#8E1B2C"/><circle class="ember" cx="260" cy="154" r="6" fill="#8E1B2C"/><circle class="ember" cx="326" cy="204" r="6" fill="#8E1B2C"/></g>
+        <!-- holder -->
+        <ellipse cx="262" cy="440" rx="104" ry="20" fill="#b8932a"/>
+        <path d="M158 440 C164 512 360 512 366 440 Z" fill="url(#brass)"/>
+        <ellipse cx="262" cy="440" rx="104" ry="20" fill="none" stroke="#7a5d10" stroke-width="2"/>
+        <ellipse cx="262" cy="517" rx="128" ry="14" fill="#000" opacity=".12"/>
+      </svg>
+    </div>
+  </div>
+  <ul class="vhero-scents wrap" aria-label="Shop by fragrance">
+    <li><a href="{% url 'store:shop' %}?q=Sandalwood">Sandalwood</a></li><li><a href="{% url 'store:shop' %}?q=Rose">Rose</a></li><li><a href="{% url 'store:shop' %}?q=Jasmine">Jasmine</a></li><li><a href="{% url 'store:shop' %}?q=Champa">Champa</a></li><li><a href="{% url 'store:shop' %}?q=Kesar">Kesar</a></li><li><a href="{% url 'store:shop' %}?q=Guggul">Guggul</a></li><li><a href="{% url 'store:shop' %}?q=Loban">Loban</a></li>
+  </ul>
+</section>
+
+<section class="wrap block">
+  <h2 class="title">{% if featured %}Customer favourites{% else %}New arrivals{% endif %}</h2>
+  <div class="grid">
+    {% for p in featured|default:latest %}{% include "store/_card.html" %}{% empty %}
+    <p class="empty">No products yet. Add your first item in the admin dashboard.</p>{% endfor %}
+  </div>
+</section>
+
+<section class="wh-band">
+  <div class="wrap wh-band-in">
+    <div class="wh-band-copy">
+      <h2>Stocking a shop, temple or event?</h2>
+      <p>Look for the wholesale rate on each product, applied automatically when you add the minimum packs. For cartons, mixed assortments or your own brand label, send us an enquiry.</p>
+      <a class="btn gold" href="{% url 'store:wholesale' %}">Ask for wholesale rates</a>
+    </div>
+    <div class="wh-carousel" data-wh-carousel role="region" aria-roledescription="carousel" aria-label="Wholesale product photos">
+      <div class="wh-carousel-viewport">
+        <div class="wh-carousel-track">
+          <figure class="wh-carousel-slide" aria-hidden="false">
+            <img src="{% static 'images/wholesale-incense.png' %}" alt="Incense sticks burning in a brass holder">
+          </figure>
+          <figure class="wh-carousel-slide" aria-hidden="true">
+            <img src="{% static 'images/wholesale-home-fragrance.png' %}" alt="Home fragrance diffusers and incense arranged on a table">
+          </figure>
+          <figure class="wh-carousel-slide" aria-hidden="true">
+            <img src="{% static 'images/wholesale-product-display.png' %}" alt="A display of assorted incense products and flowers">
+          </figure>
+        </div>
+      </div>
+      <button class="wh-carousel-arrow wh-carousel-prev" type="button" aria-label="Previous photo">&#8249;</button>
+      <button class="wh-carousel-arrow wh-carousel-next" type="button" aria-label="Next photo">&#8250;</button>
+      <div class="wh-carousel-dots" aria-label="Choose a photo">
+        <button class="wh-carousel-dot is-active" type="button" aria-label="Show photo 1" aria-current="true"></button>
+        <button class="wh-carousel-dot" type="button" aria-label="Show photo 2"></button>
+        <button class="wh-carousel-dot" type="button" aria-label="Show photo 3"></button>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

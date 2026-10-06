@@ -1,0 +1,10 @@
+{% if order.status == 'cancelled' %}
+<p class="alert">This order is cancelled.{% if order.payment_status == 'refund_due' %} Your refund is being processed.{% endif %}</p>
+{% else %}
+<ol class="track">
+  <li class="{% if order.step_index >= 0 %}done{% endif %}">Order placed</li>
+  <li class="{% if order.step_index >= 1 %}done{% endif %}">Packed</li>
+  <li class="{% if order.step_index >= 2 %}done{% endif %}">Shipped</li>
+  <li class="{% if order.step_index >= 3 %}done{% endif %}">Delivered</li>
+</ol>
+{% endif %}

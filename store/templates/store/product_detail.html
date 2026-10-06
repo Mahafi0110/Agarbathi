@@ -1,0 +1,83 @@
+{% extends "store/base.html" %}
+{% block title %}{{ product.title }}{% endblock %}
+{% block meta %}{{ product.description|truncatechars:150 }}{% endblock %}
+{% block content %}
+<section class="wrap block detail">
+  <div class="detail-img">
+    {% if product.image_url %}<img src="{{ product.image_url }}" alt="{{ product.title }}">{% else %}<span class="noimg">No image</span>{% endif %}
+  </div>
+  <div class="detail-info">
+    <p class="card-cat"><a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a></p>
+    <h1>{{ product.title }}</h1>
+    {% if product.review_count %}<p class="rating"><span class="pill">{{ product.avg_rating|floatformat:1 }} &#9733;</span> <a href="#reviews" class="muted">{{ product.review_count }} review{{ product.review_count|pluralize }}</a></p>{% endif %}
+    <p class="price big">&#8377;{{ product.price|floatformat:2 }}
+      {% if product.discount_percent %}<s class="mrp">&#8377;{{ product.mrp|floatformat:0 }}</s> <span class="off-text">{{ product.discount_percent }}% off</span>{% endif %}</p>
+    <p class="stock {% if product.in_stock %}ok{% endif %}">
+      {% if not product.in_stock %}Sold out{% elif product.low_stock %}Only {{ product.stock }} left{% else %}In stock{% endif %}</p>
+    {% if product.pack_info %}<p class="muted">Pack: {{ product.pack_info }}</p>{% endif %}
+    {% if product.has_wholesale %}
+    <div class="wh-box"><strong>Wholesale rate</strong>
+      <p>&#8377;{{ product.wholesale_price|floatformat:2 }} per pack when you buy {{ product.wholesale_min_qty }} or more. The cart applies it automatically.</p>
+      <a href="{% url 'store:wholesale' %}">Need cartons or your own brand label? Send a wholesale enquiry</a></div>
+    {% endif %}
+    <ul class="assure">
+      <li>Delivery in 3 to 5 days</li>
+      <li>{% if product.price >= free_shipping_above %}Free delivery{% else %}Free delivery above &#8377;{{ free_shipping_above|floatformat:0 }}{% endif %}</li>
+      <li>Cash on Delivery available</li>
+    </ul>
+    <div class="desc">{{ product.description|linebreaks }}</div>
+    <div class="actions">
+      {% if product.in_stock %}
+      {% include "store/_add_button.html" with p=product cls="" %}
+      {% endif %}
+      {% if user.is_authenticated %}
+      <form method="post" action="{% url 'store:wishlist_toggle' product.id %}">{% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button class="btn ghost" type="submit">{% if product.id in wishlist_ids %}Remove from wishlist{% else %}Save to wishlist{% endif %}</button>
+      </form>
+      {% else %}<a class="btn ghost" href="{% url 'store:login' %}?next={{ request.get_full_path|urlencode }}">Save to wishlist</a>{% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="wrap block" id="reviews">
+  <h2 class="title">Ratings and reviews</h2>
+  <div class="reviews">
+    <div>
+      {% if product.review_count %}
+      <p class="big-rating">{{ product.avg_rating|floatformat:1 }} <span>out of 5</span></p>
+      <ul class="bars">
+        {% for star, n, pct in distribution %}<li><span>{{ star }} &#9733;</span><i><b style="width:{{ pct }}%"></b></i><span>{{ n }}</span></li>{% endfor %}
+      </ul>
+      {% else %}<p class="muted">No reviews yet. Be the first to review this item.</p>{% endif %}
+
+      {% if user.is_authenticated %}
+      <form class="checkout" method="post" action="{% url 'store:review' product.slug %}">{% csrf_token %}
+        <h3>{% if user_review %}Edit your review{% else %}Write a review{% endif %}</h3>
+        {% for field in review_form %}<div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+        <button class="btn small" type="submit">Save review</button>
+      </form>
+      {% else %}<p><a href="{% url 'store:login' %}?next={{ request.get_full_path|urlencode }}">Log in</a> to write a review.</p>{% endif %}
+    </div>
+    <ul class="review-list">
+      {% for r in reviews %}
+      <li>
+        <p class="stars" aria-label="{{ r.rating }} out of 5">{{ r.stars }}</p>
+        <h4>{{ r.title }}</h4>
+        <p>{{ r.comment|linebreaksbr }}</p>
+        <p class="muted">{{ r.user.username }}{% if r.verified %} &middot; Verified purchase{% endif %} &middot; {{ r.created_at|date:"j M Y" }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+{% if related %}
+<section class="wrap block"><h2 class="title">More from {{ product.category.name }}</h2>
+  <div class="grid">{% for p in related %}{% include "store/_card.html" %}{% endfor %}</div></section>
+{% endif %}
+{% if recent %}
+<section class="wrap block"><h2 class="title">Recently viewed</h2>
+  <div class="grid">{% for p in recent %}{% include "store/_card.html" %}{% endfor %}</div></section>
+{% endif %}
+{% endblock %}

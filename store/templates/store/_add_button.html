@@ -1,0 +1,1 @@
+<button class="btn {{ cls }} add-to-cart" data-id="{{ p.id }}" data-title="{{ p.title }}" data-price="{{ p.price }}" data-image="{{ p.image_url }}" data-slug="{{ p.slug }}"{% if p.has_wholesale %} data-wprice="{{ p.wholesale_price }}" data-wmin="{{ p.wholesale_min_qty }}"{% endif %}>Add to cart</button>

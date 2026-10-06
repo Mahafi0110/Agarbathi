@@ -1,0 +1,29 @@
+<article class="card">
+  <div class="card-img-wrap">
+    <a class="card-img" href="{{ p.get_absolute_url }}">
+      {% if p.image_url %}<img src="{{ p.image_url }}" alt="{{ p.title }}" loading="lazy">{% else %}<span class="noimg">No image</span>{% endif %}
+    </a>
+    {% if p.discount_percent %}<span class="off-badge">{{ p.discount_percent }}% off</span>{% endif %}
+    {% if user.is_authenticated %}
+    <form class="heart-form" method="post" action="{% url 'store:wishlist_toggle' p.id %}">{% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button type="submit" class="heart {% if p.id in wishlist_ids %}on{% endif %}" aria-label="{% if p.id in wishlist_ids %}Remove from wishlist{% else %}Save to wishlist{% endif %}">&#9829;</button>
+    </form>
+    {% else %}
+    <a class="heart" href="{% url 'store:login' %}?next={{ request.get_full_path|urlencode }}" aria-label="Log in to save to wishlist">&#9829;</a>
+    {% endif %}
+  </div>
+  <div class="card-body">
+    <p class="card-cat">{{ p.category.name }}</p>
+    <h3><a href="{{ p.get_absolute_url }}">{{ p.title }}</a></h3>
+    {% if p.review_count %}<p class="rating"><span class="pill">{{ p.avg_rating|floatformat:1 }} &#9733;</span> <span class="muted">({{ p.review_count }})</span></p>{% endif %}
+    {% if p.pack_info %}<p class="muted pack">{{ p.pack_info }}</p>{% endif %}
+    {% if p.has_wholesale %}<p class="wh-note">Wholesale &#8377;{{ p.wholesale_price|floatformat:0 }} each at {{ p.wholesale_min_qty }}+ packs</p>{% endif %}
+    <div class="card-foot">
+      <span class="price">&#8377;{{ p.price|floatformat:2 }}{% if p.discount_percent %} <s class="mrp">&#8377;{{ p.mrp|floatformat:0 }}</s>{% endif %}</span>
+      {% if p.in_stock %}
+      {% include "store/_add_button.html" with cls="small" %}
+      {% else %}<span class="soldout">Sold out</span>{% endif %}
+    </div>
+  </div>
+</article>

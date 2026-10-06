@@ -1,0 +1,11 @@
+{% extends "store/base.html" %}
+{% block title %}My wishlist{% endblock %}
+{% block content %}
+<section class="wrap block">
+  <h1 class="title">My wishlist</h1>
+  <div class="grid">
+    {% for p in products %}{% include "store/_card.html" %}{% empty %}
+    <p class="empty">Nothing saved yet. Tap the heart on any product to keep it here.</p>{% endfor %}
+  </div>
+</section>
+{% endblock %}

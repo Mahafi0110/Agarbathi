@@ -1,0 +1,27 @@
+{% extends "store/base.html" %}
+{% block title %}Pay for order #{{ order.pk }}{% endblock %}
+{% block content %}
+<section class="wrap block narrow">
+  <h1 class="title">Complete your payment</h1>
+  <p class="lead">Order #{{ order.pk }} total: <strong>&#8377;{{ order.total|floatformat:2 }}</strong>. The secure Razorpay window opens automatically.</p>
+  <button id="pay-btn" class="btn" type="button">Pay now</button>
+  <p class="note">If the window did not open, press Pay now. You can pay with UPI, cards or net banking.</p>
+</section>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  var rzp = new Razorpay({
+    key: "{{ key_id|escapejs }}",
+    amount: "{{ amount_paise }}",
+    currency: "INR",
+    name: "Shubham Pooja",
+    description: "Order #{{ order.pk }}",
+    order_id: "{{ order.razorpay_order_id|escapejs }}",
+    callback_url: "{{ callback_url|escapejs }}",
+    redirect: true,
+    prefill: { name: "{{ order.full_name|escapejs }}", contact: "{{ order.phone|escapejs }}", email: "{{ order.email|escapejs }}" },
+    theme: { color: "#8E1B2C" }
+  });
+  document.getElementById("pay-btn").addEventListener("click", function () { rzp.open(); });
+  rzp.open();
+</script>
+{% endblock %}

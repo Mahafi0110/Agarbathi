@@ -1,0 +1,21 @@
+{% extends "store/base.html" %}
+{% block title %}Order #{{ order.pk }}{% endblock %}
+{% block content %}
+<section class="wrap block narrow">
+  <h1 class="title">Order #{{ order.pk }}</h1>
+  <p class="muted">Placed {{ order.created_at|date:"j M Y, g:i a" }}</p>
+  {% include "store/_tracker.html" %}
+  {% include "store/_order_summary.html" %}
+  <h2 class="sub">Delivering to</h2>
+  <p>{{ order.full_name }}, {{ order.phone }}<br>{{ order.address|linebreaksbr }}<br>{{ order.city }} {{ order.pincode }}</p>
+  {% if order.status == 'delivered' %}
+  <p>Happy with it? Open an item above and write a review.</p>
+  {% endif %}
+  {% if order.can_cancel %}
+  <form method="post" action="{% url 'store:cancel_order' order.pk %}" onsubmit="return confirm('Cancel this order?');">{% csrf_token %}
+    <button class="btn ghost" type="submit">Cancel order</button>
+  </form>
+  {% endif %}
+  <p><a href="{% url 'store:account_orders' %}">Back to my orders</a></p>
+</section>
+{% endblock %}

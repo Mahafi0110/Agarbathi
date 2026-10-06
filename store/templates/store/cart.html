@@ -1,0 +1,38 @@
+{% extends "store/base.html" %}
+{% block title %}Your cart{% endblock %}
+{% block content %}
+<section class="wrap block">
+  <h1 class="title">Your cart</h1>
+  {% if error %}<p class="alert" role="alert">{{ error }}</p>{% endif %}
+
+  <p id="cart-empty" class="empty" hidden>Your cart is empty. <a href="{% url 'store:shop' %}">Browse pooja items</a>.</p>
+
+  <div id="cart-wrap" class="cart-layout" data-free-above="{{ free_shipping_above }}" data-fee="{{ shipping_fee }}" hidden>
+    <div>
+      <ul id="cart-lines" class="lines"></ul>
+      <dl class="sum">
+        <div><dt>Items</dt><dd id="cart-subtotal"></dd></div>
+        <div><dt>Delivery</dt><dd id="cart-shipping"></dd></div>
+        <div class="grand"><dt>Estimated total</dt><dd id="cart-total"></dd></div>
+      </dl>
+      <p id="ship-note" class="note"></p>
+      <p class="note">Coupons are applied, and prices and stock confirmed, when you place the order.</p>
+    </div>
+
+    <form id="checkout-form" class="checkout" method="post" action="{% url 'store:cart' %}">
+      {% csrf_token %}
+      <input type="hidden" name="cart_json" id="cart-json">
+      <h2>Delivery details</h2>
+      {% if not user.is_authenticated %}<p class="note"><a href="{% url 'store:login' %}?next={% url 'store:cart' %}">Log in</a> to save your orders and addresses, or continue as a guest.</p>{% endif %}
+      {% for field in form %}
+      <div class="field {% if field.name == 'payment_method' %}pay-field{% endif %}">
+        <label {% if field.name != 'payment_method' %}for="{{ field.id_for_label }}"{% endif %}>{{ field.label }}</label>
+        {{ field }}
+        {% for e in field.errors %}<p class="err">{{ e }}</p>{% endfor %}
+      </div>
+      {% endfor %}
+      <button class="btn" type="submit">Place order</button>
+    </form>
+  </div>
+</section>
+{% endblock %}
