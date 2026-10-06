@@ -169,3 +169,11 @@ EMAIL_BACKEND = (
 )
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER or "noreply@localhost")
 WHOLESALE_NOTIFY_EMAIL = os.environ.get("WHOLESALE_NOTIFY_EMAIL", EMAIL_HOST_USER)
+
+# Print the full error (traceback) in the host's log whenever a page crashes, so problems can be diagnosed
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "loggers": {"django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False}},
+}
