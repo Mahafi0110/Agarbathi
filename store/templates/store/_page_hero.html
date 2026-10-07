@@ -1,0 +1,11 @@
+<section class="page-hero {{ cls }}">
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="{% url 'store:home' %}">Home</a><span aria-hidden="true">/</span>
+      {% if parent %}<a href="{{ parent_url }}">{{ parent }}</a><span aria-hidden="true">/</span>{% endif %}
+      <span aria-current="page">{{ crumb }}</span>
+    </nav>
+    <h1>{{ title }}</h1>
+    {% if subtitle %}<p>{{ subtitle }}</p>{% endif %}
+  </div>
+</section>

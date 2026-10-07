@@ -1,5 +1,4 @@
 {% extends "store/base.html" %}
-{% load static %}
 {% block content %}
 <style>.vhero-scents a{color:inherit;text-decoration:none}.vhero-scents a:hover{color:var(--crimson)}</style>
 <section class="vhero">
@@ -8,7 +7,7 @@
       <h1>Fragrance for every prayer, <em>by the pack or by the carton</em></h1>
       <p>Hand-rolled sandalwood, rose, jasmine and champa agarbatti. Buy a single pack for your pooja room, or stock your shop and temple at wholesale rates.</p>
       <div class="vhero-cta">
-        <a class="btn" href="{% url 'store:shop' %}">Shop retail</a>
+        <a class="btn" href="{% url 'store:shop' %}">Shop products</a>
         <a class="btn ghost" href="{% url 'store:wholesale' %}">Wholesale rates</a>
       </div>
       <ul class="vhero-facts">
@@ -56,42 +55,82 @@
 </section>
 
 <section class="wrap block">
+  <h2 class="title">Buy the way that suits you</h2>
+  <div class="buy-split">
+    <article class="buy-card">
+      <h3>Retail</h3>
+      <p>For your home pooja room and daily aarti.</p>
+      <ul>
+        <li>Single packs, no minimum</li>
+        <li>Cash on Delivery or online payment</li>
+        <li>Free delivery above &#8377;{{ free_shipping_above|floatformat:0 }}</li>
+      </ul>
+      <a class="btn" href="{% url 'store:shop' %}">Shop retail</a>
+    </article>
+    <article class="buy-card dark">
+      <h3>Wholesale</h3>
+      <p>For shops, temples, events and distributors.</p>
+      <ul>
+        <li>Wholesale rate on each product, applied in your cart</li>
+        <li>Cartons, assortments and your own brand label on request</li>
+        <li>Call or WhatsApp for a quote</li>
+      </ul>
+      <a class="btn gold" href="{% url 'store:wholesale' %}">Ask for wholesale rates</a>
+    </article>
+  </div>
+</section>
+
+<section class="wrap block">
   <h2 class="title">{% if featured %}Customer favourites{% else %}New arrivals{% endif %}</h2>
   <div class="grid">
     {% for p in featured|default:latest %}{% include "store/_card.html" %}{% empty %}
     <p class="empty">No products yet. Add your first item in the admin dashboard.</p>{% endfor %}
   </div>
+  <p class="more"><a class="btn ghost" href="{% url 'store:shop' %}">View all products</a></p>
+</section>
+
+<section class="why">
+  <div class="wrap block">
+    <h2 class="title">Why choose us</h2>
+    <ol class="why-grid">
+      {% for heading, text in info.WHY_US %}
+      <li><span class="num" aria-hidden="true">{{ forloop.counter }}</span><h3>{{ heading }}</h3><p>{{ text }}</p></li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+
+<section class="wrap block">
+  <h2 class="title">What our customers say</h2>
+  <div class="testi">
+    {% for quote, name, role, city in info.TESTIMONIALS %}
+    <figure>
+      <blockquote><p>{{ quote }}</p></blockquote>
+      <figcaption><strong>{{ name }}</strong><span>{{ role }}, {{ city }}</span></figcaption>
+    </figure>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="wrap block faq-wrap" id="faq">
+  <div>
+    <h2 class="title">Frequently asked questions</h2>
+    <p class="lead">Quick answers about buying retail and wholesale. Still stuck? <a href="{% url 'store:contact' %}">Contact us</a>.</p>
+  </div>
+  <div class="faq">
+    {% for q, a in info.FAQS %}
+    <details {% if forloop.first %}open{% endif %}><summary>{{ q }}</summary><p>{{ a }}</p></details>
+    {% endfor %}
+  </div>
 </section>
 
 <section class="wh-band">
   <div class="wrap wh-band-in">
-    <div class="wh-band-copy">
+    <div>
       <h2>Stocking a shop, temple or event?</h2>
       <p>Look for the wholesale rate on each product, applied automatically when you add the minimum packs. For cartons, mixed assortments or your own brand label, send us an enquiry.</p>
-      <a class="btn gold" href="{% url 'store:wholesale' %}">Ask for wholesale rates</a>
     </div>
-    <div class="wh-carousel" data-wh-carousel role="region" aria-roledescription="carousel" aria-label="Wholesale product photos">
-      <div class="wh-carousel-viewport">
-        <div class="wh-carousel-track">
-          <figure class="wh-carousel-slide" aria-hidden="false">
-            <img src="{% static 'images/wholesale-incense.png' %}" alt="Incense sticks burning in a brass holder">
-          </figure>
-          <figure class="wh-carousel-slide" aria-hidden="true">
-            <img src="{% static 'images/wholesale-home-fragrance.png' %}" alt="Home fragrance diffusers and incense arranged on a table">
-          </figure>
-          <figure class="wh-carousel-slide" aria-hidden="true">
-            <img src="{% static 'images/wholesale-product-display.png' %}" alt="A display of assorted incense products and flowers">
-          </figure>
-        </div>
-      </div>
-      <button class="wh-carousel-arrow wh-carousel-prev" type="button" aria-label="Previous photo">&#8249;</button>
-      <button class="wh-carousel-arrow wh-carousel-next" type="button" aria-label="Next photo">&#8250;</button>
-      <div class="wh-carousel-dots" aria-label="Choose a photo">
-        <button class="wh-carousel-dot is-active" type="button" aria-label="Show photo 1" aria-current="true"></button>
-        <button class="wh-carousel-dot" type="button" aria-label="Show photo 2"></button>
-        <button class="wh-carousel-dot" type="button" aria-label="Show photo 3"></button>
-      </div>
-    </div>
+    <a class="btn gold" href="{% url 'store:wholesale' %}">Ask for wholesale rates</a>
   </div>
 </section>
 {% endblock %}

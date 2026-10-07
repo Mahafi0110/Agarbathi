@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from .cloud import upload_image, validate_image
-from .models import Category, Coupon, Order, OrderItem, Product, Review, WholesaleEnquiry
+from .models import Category, ContactMessage, Coupon, Order, OrderItem, Product, Review, WholesaleEnquiry
 
 
 class ImageUploadForm(forms.ModelForm):
@@ -33,7 +33,7 @@ class CloudinaryAdminMixin:
 class CategoryForm(ImageUploadForm):
     class Meta:
         model = Category
-        fields = ["name", "slug", "description"]
+        fields = ["name", "slug", "description", "show_in_menu"]
 
 
 class ProductForm(ImageUploadForm):
@@ -51,7 +51,8 @@ class ProductForm(ImageUploadForm):
 @admin.register(Category)
 class CategoryAdmin(CloudinaryAdminMixin, admin.ModelAdmin):
     form = CategoryForm
-    list_display = ("thumb", "name", "slug")
+    list_display = ("thumb", "name", "slug", "show_in_menu")
+    list_editable = ("show_in_menu",)
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ("name",)
 
@@ -128,4 +129,13 @@ class WholesaleEnquiryAdmin(admin.ModelAdmin):
     list_filter = ("handled", "created_at")
     list_editable = ("handled",)
     search_fields = ("name", "business_name", "phone", "city")
+    readonly_fields = ("created_at",)
+
+
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ("name", "email", "phone", "subject", "created_at", "handled")
+    list_filter = ("handled", "created_at")
+    list_editable = ("handled",)
+    search_fields = ("name", "email", "subject", "message")
     readonly_fields = ("created_at",)

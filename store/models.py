@@ -12,6 +12,7 @@ class Category(models.Model):
     slug = models.SlugField(max_length=90, unique=True)
     description = models.CharField(max_length=240, blank=True)
     image_url = models.URLField(max_length=500, blank=True, editable=False)
+    show_in_menu = models.BooleanField(default=True, help_text="Untick to hide this category from the menu bar. Its products still appear under All items.")
 
     class Meta:
         verbose_name_plural = "categories"
@@ -215,3 +216,19 @@ class WholesaleEnquiry(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.business_name or self.city})"
+
+
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=120)
+    email = models.EmailField()
+    phone = models.CharField(max_length=15, blank=True, validators=[RegexValidator(r"^[0-9+\- ]{8,15}$", "Enter a valid phone number.")])
+    subject = models.CharField(max_length=140, blank=True)
+    message = models.TextField(max_length=3000)
+    handled = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.name}: {self.subject or 'message'}"

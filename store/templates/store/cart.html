@@ -5,7 +5,7 @@
   <h1 class="title">Your cart</h1>
   {% if error %}<p class="alert" role="alert">{{ error }}</p>{% endif %}
 
-  <p id="cart-empty" class="empty" hidden>Your cart is empty. <a href="{% url 'store:shop' %}">Browse pooja items</a>.</p>
+  <p id="cart-empty" class="empty" hidden>Your cart is empty. <a href="{% url 'store:shop' %}">Browse products</a>.</p>
 
   <div id="cart-wrap" class="cart-layout" data-free-above="{{ free_shipping_above }}" data-fee="{{ shipping_fee }}" hidden>
     <div>

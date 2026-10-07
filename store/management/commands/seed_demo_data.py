@@ -47,6 +47,10 @@ DATA = {
 }
 
 
+# Categories left out of the menu bar (their products still show under All items)
+HIDDEN_FROM_MENU = {"Premium Masala Agarbatti"}
+
+
 def make_picture(title):
     """A plain ivory and gold card with the product name, just so the grid has something to show."""
     from PIL import Image, ImageDraw, ImageFont
@@ -108,7 +112,8 @@ class Command(BaseCommand):
         made = 0
         for cat_name, (cat_desc, items) in DATA.items():
             category, _ = Category.objects.update_or_create(
-                slug=slugify(cat_name), defaults={"name": cat_name, "description": cat_desc})
+                slug=slugify(cat_name),
+                defaults={"name": cat_name, "description": cat_desc, "show_in_menu": cat_name not in HIDDEN_FROM_MENU})
             for title, desc, pack, price, stock, featured, wmin in items:
                 retail = Decimal(price)
                 product, created = Product.objects.update_or_create(

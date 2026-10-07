@@ -8,20 +8,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Montserrat:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=9">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <link rel="stylesheet" href="{% static 'css/shop-extras.css' %}">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
-  <header class="site-header" id="top">
-    <div class="wrap bar">
-      <a class="brand" href="{% url 'store:home' %}"><img class="brand-logo" src="{% static 'images/logo-pooja.svg' %}" alt=""><span class="brand-name">Shubham Pooja</span></a>
-      <form class="search" action="{% url 'store:shop' %}" method="get" role="search">
-        <input type="search" name="q" placeholder="Search sandalwood, rose, jasmine, dhoop" aria-label="Search products" value="{{ q|default:'' }}">
-        <button type="submit">Search</button>
-      </form>
+  {% with n=request.resolver_match.url_name %}
+  <div class="utility">
+    <div class="wrap utility-in">
+      <p>Retail and wholesale agarbatti &middot; Free delivery above &#8377;{{ free_shipping_above|floatformat:0 }}</p>
       <div class="acct">
-        <a href="{% url 'store:wholesale' %}">Wholesale</a>
+        <a href="{% url 'store:wholesale' %}">Wholesale enquiry</a>
         {% if user.is_authenticated %}
         <a href="{% url 'store:account_orders' %}">My orders</a>
         <a href="{% url 'store:wishlist' %}">Wishlist</a>
@@ -31,9 +28,27 @@
         <a href="{% url 'store:signup' %}">Sign up</a>
         {% endif %}
       </div>
-      <a class="cart-link" href="{% url 'store:cart' %}">Cart <span id="cart-count" class="badge" aria-live="polite">0</span></a>
     </div>
-    <details class="category-menu wrap" open>
+  </div>
+
+  <header class="site-header" id="top">
+    <div class="wrap bar">
+      <a class="brand" href="{% url 'store:home' %}">Shubham Pooja</a>
+      <nav class="main-nav" aria-label="Main">
+        <a href="{% url 'store:home' %}" {% if n == 'home' %}aria-current="page"{% endif %}>Home</a>
+        <a href="{% url 'store:about' %}" {% if n == 'about' %}aria-current="page"{% endif %}>About</a>
+        <a href="{% url 'store:shop' %}" {% if n == 'shop' or n == 'category' or n == 'product' %}aria-current="page"{% endif %}>Products</a>
+        <a href="{% url 'store:contact' %}" {% if n == 'contact' %}aria-current="page"{% endif %}>Contact</a>
+      </nav>
+      <div class="bar-tools">
+      <form class="search" action="{% url 'store:shop' %}" method="get" role="search">
+        <input type="search" name="q" placeholder="Search products" aria-label="Search products" value="{{ q|default:'' }}">
+        <button type="submit">Search</button>
+      </form>
+      <a class="cart-link" href="{% url 'store:cart' %}">Cart <span id="cart-count" class="badge" aria-live="polite">0</span></a>
+      </div>
+    </div>
+    <details class="category-menu wrap" open {% if n != 'shop' and n != 'category' and n != 'product' %}hidden{% endif %}>
       <summary class="category-menu-toggle">
         <span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
         <span>Categories</span>
@@ -46,15 +61,12 @@
         </div>
         <div class="cats-links">
           <a href="{% url 'store:shop' %}">All items</a>
-          {% for c in nav_categories %}
-            {% if c.name != "Premium Masala Agarbatti" and c.name != "Dhoop Sticks and Cones" %}
-              <a href="{{ c.get_absolute_url }}">{{ c.name }}</a>
-            {% endif %}
-          {% endfor %}
+          {% for c in menu_categories %}<a href="{{ c.get_absolute_url }}">{{ c.name }}</a>{% endfor %}
         </div>
       </nav>
     </details>
   </header>
+  {% endwith %}
 
   <main id="main">
   {% if messages %}<div class="wrap msgs">{% for m in messages %}<p class="msg {{ m.tags }}" role="status">{{ m }}</p>{% endfor %}</div>{% endif %}
@@ -63,16 +75,18 @@
   <footer class="site-footer">
     <div class="wrap footer-content">
       <div class="footer-about">
-        <a class="brand" href="{% url 'store:home' %}"><img class="brand-logo" src="{% static 'images/logo-pooja.svg' %}" alt=""><span class="brand-name">Shubham Pooja</span></a>
+        <a class="brand" href="{% url 'store:home' %}">Shubham Pooja</a>
         <p>Agarbatti and dhoop for daily worship and festivals, for homes, shops and temples.</p>
+        <p class="footer-contact"><a href="tel:{{ info.CONTACT.phone_link }}">{{ info.CONTACT.phone }}</a><br><a href="mailto:{{ info.CONTACT.email }}">{{ info.CONTACT.email }}</a></p>
       </div>
       <nav class="footer-links" aria-label="Explore">
         <h2>Explore</h2>
         <a href="{% url 'store:home' %}">Home</a>
-        <a href="{% url 'store:shop' %}">Shop all items</a>
+        <a href="{% url 'store:about' %}">About us</a>
+        <a href="{% url 'store:shop' %}">Products</a>
+        <a href="{% url 'store:contact' %}">Contact</a>
         <a href="{% url 'store:wholesale' %}">Wholesale enquiry</a>
         <a href="{% url 'store:cart' %}">Shopping cart</a>
-        <a href="#top">Back to top</a>
       </nav>
       <nav class="footer-links" aria-label="Shop by category">
         <h2>Shop by category</h2>
@@ -88,6 +102,5 @@
   </footer>
   <script src="{% static 'js/navigation.js' %}"></script>
   <script src="{% static 'js/cart.js' %}"></script>
-  <script src="{% static 'js/wholesale-carousel.js' %}"></script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
+from django.views.generic import RedirectView
 
 from . import views
 
@@ -7,8 +8,11 @@ app_name = "store"
 
 urlpatterns = [
     path("", views.home, name="home"),
-    path("shop/", views.product_list, name="shop"),
-    path("shop/category/<slug:slug>/", views.product_list, name="category"),
+    path("about/", views.about, name="about"),
+    path("contact/", views.contact, name="contact"),
+    path("products/", views.product_list, name="shop"),
+    path("products/category/<slug:slug>/", views.product_list, name="category"),
+    path("shop/", RedirectView.as_view(pattern_name="store:shop", query_string=True)),  # old address
     path("product/<slug:slug>/", views.product_detail, name="product"),
     path("product/<slug:slug>/review/", views.review_submit, name="review"),
 

@@ -1,0 +1,40 @@
+{% extends "store/base.html" %}
+{% block title %}About us{% endblock %}
+{% block meta %}About Shubham Pooja: agarbatti and dhoop for homes, shops and temples, available in retail packs and wholesale quantities.{% endblock %}
+{% block content %}
+{# DEMO COPY: replace with the client's real story, years in business and claims before launch. #}
+{% include "store/_page_hero.html" with cls="hero-about" crumb="About" title="Fragrance for every prayer" subtitle="We supply agarbatti and dhoop to homes, shops and temples, one pack at a time or by the carton." %}
+
+<section class="wrap block about-grid">
+  <div class="prose">
+    <h2>Our story</h2>
+    <p>Shubham Pooja began with a simple idea: the incense used in daily worship should smell calm, burn evenly and be easy to buy, whether you need one pack for the pooja room or a hundred for a shop.</p>
+    <p>Today we offer sandalwood, floral, masala and dhoop ranges, packed carefully and priced fairly for both retail and wholesale buyers.</p>
+    <h2>What we stand for</h2>
+    <ul class="ticks">
+      <li>Fragrances chosen for daily worship, not for show.</li>
+      <li>Clear pack sizes and honest descriptions on every product.</li>
+      <li>One catalogue for retail and wholesale, with the bulk rate shown up front.</li>
+      <li>A phone number that is answered when you have a question.</li>
+    </ul>
+  </div>
+  <aside class="about-side">
+    <h2>Retail and wholesale</h2>
+    <p><strong>Retail:</strong> buy single packs for your home, with Cash on Delivery or online payment.</p>
+    <p><strong>Wholesale:</strong> shops, temples and event organisers get a bulk rate on each product, plus cartons, assortments and private label on request.</p>
+    <a class="btn" href="{% url 'store:shop' %}">Browse products</a>
+    <a class="btn ghost" href="{% url 'store:wholesale' %}">Wholesale enquiry</a>
+  </aside>
+</section>
+
+<section class="why">
+  <div class="wrap block">
+    <h2 class="title">Why customers stay with us</h2>
+    <ol class="why-grid">
+      {% for heading, text in info.WHY_US|slice:":3" %}
+      <li><span class="num" aria-hidden="true">{{ forloop.counter }}</span><h3>{{ heading }}</h3><p>{{ text }}</p></li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+{% endblock %}

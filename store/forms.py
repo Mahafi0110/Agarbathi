@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
 from . import payments
-from .models import Order, Review, WholesaleEnquiry
+from .models import ContactMessage, Order, Review, WholesaleEnquiry
 
 
 class CheckoutForm(forms.ModelForm):
@@ -58,3 +58,13 @@ class WholesaleForm(forms.ModelForm):
         fields = ["name", "business_name", "phone", "email", "city", "monthly_quantity", "message"]
         widgets = {"message": forms.Textarea(attrs={"rows": 3, "placeholder": "Which fragrances, pack sizes or your own brand label?"})}
         labels = {"name": "Your name", "business_name": "Shop or business name"}
+
+
+class ContactForm(forms.ModelForm):
+    website = forms.CharField(required=False, widget=forms.HiddenInput)  # honeypot
+
+    class Meta:
+        model = ContactMessage
+        fields = ["name", "email", "phone", "subject", "message"]
+        widgets = {"message": forms.Textarea(attrs={"rows": 5})}
+        labels = {"name": "Your name", "phone": "Phone (optional)", "subject": "Subject (optional)"}

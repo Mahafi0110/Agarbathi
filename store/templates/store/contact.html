@@ -1,0 +1,48 @@
+{% extends "store/base.html" %}
+{% block title %}Contact us{% endblock %}
+{% block meta %}Contact Shubham Pooja for agarbatti orders, wholesale quotes and questions. Call, WhatsApp or send a message.{% endblock %}
+{% block content %}
+{# DEMO DETAILS: edit store/shop_info.py to put in the client's real phone, email, address and hours. #}
+{% include "store/_page_hero.html" with cls="hero-contact" crumb="Contact" title="Contact us" subtitle="Questions about a fragrance, an order or a bulk quote? We are happy to help." %}
+
+<section class="wrap block contact-grid">
+  <div class="contact-left">
+  <div class="contact-cards">
+    <article>
+      <h2>Call or WhatsApp</h2>
+      <p><a href="tel:{{ info.CONTACT.phone_link }}">{{ info.CONTACT.phone }}</a></p>
+      <a class="btn small" href="https://wa.me/{{ info.CONTACT.whatsapp }}?text=Hello%2C%20I%20would%20like%20to%20know%20about%20your%20agarbatti.">Chat on WhatsApp</a>
+    </article>
+    <article>
+      <h2>Email</h2>
+      <p><a href="mailto:{{ info.CONTACT.email }}">{{ info.CONTACT.email }}</a></p>
+    </article>
+    <article>
+      <h2>Visit us</h2>
+      <p>{% for line in info.CONTACT.address %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</p>
+      <a class="btn ghost small" href="https://www.google.com/maps/search/?api=1&amp;query={{ info.CONTACT.maps_query|urlencode }}" target="_blank" rel="noopener">Get directions</a>
+    </article>
+    <article>
+      <h2>Opening hours</h2>
+      <p>{% for line in info.CONTACT.hours %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</p>
+    </article>
+  </div>
+
+  <div class="map-card">
+    <iframe title="Map showing our shop location" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+      src="https://www.google.com/maps?q={{ info.CONTACT.maps_query|urlencode }}&amp;output=embed"></iframe>
+    <p><a href="https://www.google.com/maps/dir/?api=1&amp;destination={{ info.CONTACT.maps_query|urlencode }}" target="_blank" rel="noopener">Get directions in Google Maps</a></p>
+  </div>
+  </div>
+
+  <form class="checkout" method="post" action="{% url 'store:contact' %}">
+    {% csrf_token %}
+    <h2>Send us a message</h2>
+    {% for field in form %}{% if field.is_hidden %}{{ field }}{% else %}
+    <div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}
+      {% for e in field.errors %}<p class="err">{{ e }}</p>{% endfor %}</div>{% endif %}{% endfor %}
+    <button class="btn" type="submit">Send message</button>
+    <p class="note">Looking for bulk rates? Use the <a href="{% url 'store:wholesale' %}">wholesale enquiry form</a>.</p>
+  </form>
+</section>
+{% endblock %}

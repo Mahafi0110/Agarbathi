@@ -1,9 +1,13 @@
 {% extends "store/base.html" %}
-{% block title %}{% if category %}{{ category.name }}{% else %}All pooja items{% endif %}{% endblock %}
+{% block title %}{% if category %}{{ category.name }}{% else %}Products{% endif %}{% endblock %}
 {% block content %}
+{% url 'store:shop' as shop_url %}
+{% if category %}
+{% include "store/_page_hero.html" with cls="hero-products" parent="Products" parent_url=shop_url crumb=category.name title=hero_title subtitle=hero_sub %}
+{% else %}
+{% include "store/_page_hero.html" with cls="hero-products" crumb="Products" title=hero_title subtitle=hero_sub %}
+{% endif %}
 <section class="wrap block">
-  <h1 class="title">{% if category %}{{ category.name }}{% elif q %}Results for "{{ q }}"{% else %}All pooja items{% endif %}</h1>
-  {% if category.description %}<p class="lead">{{ category.description }}</p>{% endif %}
 
   <form class="toolbar" method="get">
     {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}

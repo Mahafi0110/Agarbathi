@@ -18,7 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
 
 from . import payments
-from .forms import CheckoutForm, ReviewForm, SignupForm, WholesaleForm
+from .forms import CheckoutForm, ContactForm, ReviewForm, SignupForm, WholesaleForm
 from .models import Coupon, Order, OrderItem, Product, Review, Wishlist
 
 MAX_LINE_QTY = 500
@@ -121,11 +121,20 @@ def product_list(request, slug=None):
     sort = request.GET.get("sort", "")
     products = products.order_by(*SORTS.get(sort, ["-created_at"]))
 
+    if category:
+        hero_title = category.name
+        hero_sub = category.description or "Retail packs and wholesale rates."
+    elif q:
+        hero_title, hero_sub = f"Results for \u201c{q}\u201d", "Retail packs and wholesale rates."
+    else:
+        hero_title = "Our agarbatti collection"
+        hero_sub = "Sandalwood, floral, masala and dhoop ranges, with retail packs and wholesale rates."
+
     page = Paginator(products, 12).get_page(request.GET.get("page"))
     params = request.GET.copy()
     params.pop("page", None)
     return render(request, "store/product_list.html", {
-        "page": page, "category": category, "q": q, "sort": sort, "instock": instock,
+        "page": page, "category": category, "hero_title": hero_title, "hero_sub": hero_sub, "q": q, "sort": sort, "instock": instock,
         "min": request.GET.get("min", ""), "max": request.GET.get("max", ""),
         "querystring": params.urlencode(),
     })
@@ -364,39 +373,41 @@ def _one_line(text):
     return " ".join(str(text).split())
 
 
-def _notify_wholesale(enquiry):
-    """Email the owner (and confirm to the customer). A mail problem never breaks the form."""
+def _mail_owner(subject, lines, reply_to=None, confirm_to=None, confirm_body=""):
+    """Email the owner, and optionally confirm to the customer. A mail problem never breaks the form."""
     owner = settings.WHOLESALE_NOTIFY_EMAIL
     if not owner:
         return
-    lines = [
-        f"Name: {_one_line(enquiry.name)}",
-        f"Business: {_one_line(enquiry.business_name) or '-'}",
-        f"Phone: {_one_line(enquiry.phone)}",
-        f"Email: {_one_line(enquiry.email) or '-'}",
-        f"City: {_one_line(enquiry.city)}",
-        f"Packs per month: {_one_line(enquiry.monthly_quantity) or '-'}",
-        "",
-        enquiry.message or "(no message)",
-    ]
     try:
         EmailMessage(
-            subject=f"New wholesale enquiry from {_one_line(enquiry.name)}",
-            body="\n".join(lines),
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[owner],
-            reply_to=[enquiry.email] if enquiry.email else None,
+            subject=_one_line(subject), body="\n".join(lines), from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[owner], reply_to=[reply_to] if reply_to else None,
         ).send()
-        if enquiry.email:
-            EmailMessage(
-                subject="We received your wholesale enquiry",
-                body=f"Hello {_one_line(enquiry.name)},\n\nThank you for your wholesale enquiry. "
-                     "We will call you soon with rates.\n\nShubham Pooja",
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                to=[enquiry.email],
-            ).send()
+        if confirm_to:
+            EmailMessage(subject="We received your message", body=confirm_body,
+                         from_email=settings.DEFAULT_FROM_EMAIL, to=[confirm_to]).send()
     except Exception:
-        logger.exception("Could not send wholesale enquiry email for enquiry %s", enquiry.pk)
+        logger.exception("Could not send notification email: %s", subject)
+
+
+def _notify_wholesale(enquiry):
+    _mail_owner(
+        f"New wholesale enquiry from {_one_line(enquiry.name)}",
+        [
+            f"Name: {_one_line(enquiry.name)}",
+            f"Business: {_one_line(enquiry.business_name) or '-'}",
+            f"Phone: {_one_line(enquiry.phone)}",
+            f"Email: {_one_line(enquiry.email) or '-'}",
+            f"City: {_one_line(enquiry.city)}",
+            f"Packs per month: {_one_line(enquiry.monthly_quantity) or '-'}",
+            "",
+            enquiry.message or "(no message)",
+        ],
+        reply_to=enquiry.email or None,
+        confirm_to=enquiry.email or None,
+        confirm_body=f"Hello {_one_line(enquiry.name)},\n\nThank you for your wholesale enquiry. "
+                     "We will call you soon with rates.\n\nShubham Pooja",
+    )
 
 
 @require_http_methods(["GET", "POST"])
@@ -409,3 +420,27 @@ def wholesale(request):
         return redirect("store:wholesale")
     deals = base_products().filter(wholesale_min_qty__gt=0, wholesale_price__isnull=False)[:6]
     return render(request, "store/wholesale.html", {"form": form, "deals": deals})
+
+
+# ---------- about and contact ----------
+def about(request):
+    return render(request, "store/about.html")
+
+
+@require_http_methods(["GET", "POST"])
+def contact(request):
+    form = ContactForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        if not form.cleaned_data.get("website"):  # bots fill the hidden field; skip saving
+            msg = form.save()
+            _mail_owner(
+                f"Website message: {_one_line(msg.subject) or _one_line(msg.name)}",
+                [f"Name: {_one_line(msg.name)}", f"Email: {_one_line(msg.email)}",
+                 f"Phone: {_one_line(msg.phone) or '-'}", "", msg.message],
+                reply_to=msg.email,
+                confirm_to=msg.email,
+                confirm_body=f"Hello {_one_line(msg.name)},\n\nThank you for contacting us. We will reply soon.\n\nShubham Pooja",
+            )
+        messages.success(request, "Thank you. Your message has been sent and we will reply soon.")
+        return redirect("store:contact")
+    return render(request, "store/contact.html", {"form": form})
